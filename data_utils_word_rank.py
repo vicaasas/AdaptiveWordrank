@@ -16,7 +16,7 @@ def to_cuda(batch, gpuid):
             batch[n] = batch[n].to(gpuid)
 
 
-class BrioDataset(Dataset):
+class AdaptiveWrodRankDataset(Dataset):
     def __init__(self, data_type, model_type,dataset, max_len=-1, is_test=False, total_len=1024, is_sorted=True, max_num=-1, is_untok=True, is_pegasus=False, num=-1):
         """ data format: article, abstract, [(candidiate_i, score_i)] """
         if dataset=="cnndm":

@@ -8,12 +8,7 @@ import random
 from compare_mt.rouge.rouge_scorer import RougeScorer
 from transformers import BartTokenizerFast,PegasusTokenizer
 from utils import Recorder
-# from data_utils_keyword_segment_emb import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_3_word_combine import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_2 import to_cuda, collate_mp_brio, BrioDataset
-from data_utils_word_rank import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_origin import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_ctrlsum import to_cuda, collate_mp_brio, BrioDataset
+from data_utils_word_rank import to_cuda, collate_mp_brio, AdaptiveWrodRankDataset
 from torch.utils.data import DataLoader
 import torch.distributed as dist
 from functools import partial
@@ -104,11 +99,11 @@ def evaluation(args):
     else:
         tok = BartTokenizerFast.from_pretrained(args.model_type)
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
-    # test_set = BrioDataset(f"cnndm/diverse/test", args.model_type, is_test=True, max_len=1024,
-    # test_set = BrioDataset(f"/work/u5516210/AdaptiveWordrank/cnndm_cased/test", args.model_type, is_test=True, max_len=1024,
-    test_set = BrioDataset(f"test", args.model_type,dataset=args.config, is_test=True, max_len=512,
+    # test_set = AdaptiveWrodRankDataset(f"cnndm/diverse/test", args.model_type, is_test=True, max_len=1024,
+    # test_set = AdaptiveWrodRankDataset(f"/work/u5516210/AdaptiveWordrank/cnndm_cased/test", args.model_type, is_test=True, max_len=1024,
+    test_set = AdaptiveWrodRankDataset(f"test", args.model_type,dataset=args.config, is_test=True, max_len=512,
      is_sorted=False, max_num=args.max_num, is_untok=True, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    # test_set = BrioDataset(f"/work/u5516210/ctrl-sum/datasets/cnndm/test.source",
+    # test_set = AdaptiveWrodRankDataset(f"/work/u5516210/ctrl-sum/datasets/cnndm/test.source",
     #                         "/work/u5516210/ctrl-sum/datasets/cnndm/test.target",
     #                         "facebook/bart-large-cnn", max_len=120, is_test=True,total_len=1024)
     batch_size = 12
@@ -500,8 +495,8 @@ def run(rank, args):
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
     
-    train_set = BrioDataset(f"train", args.model_type,dataset=args.config,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    val_set = BrioDataset(f"validation", args.model_type,dataset=args.config, is_test=True,
+    train_set = AdaptiveWrodRankDataset(f"train", args.model_type,dataset=args.config,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
+    val_set = AdaptiveWrodRankDataset(f"validation", args.model_type,dataset=args.config, is_test=True,
                             is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
     dataloader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=12, collate_fn=collate_fn)
     val_dataloader = DataLoader(val_set, batch_size=4, shuffle=False, num_workers=4, collate_fn=collate_fn_val)

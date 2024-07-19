@@ -12,14 +12,7 @@ from transformers import (
     HammingDiversityLogitsProcessor
 )
 from utils import Recorder
-# from data_utils_keyword_segment_emb import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_3_word_combine import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_2 import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_origin import to_cuda, collate_mp_brio, BrioDataset
-from data_utils_word_rank import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_pegasusBaseline import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_origin import to_cuda, collate_mp_brio, BrioDataset
-# from data_utils_ctrlsum import to_cuda, collate_mp_brio, BrioDataset
+from data_utils_word_rank import to_cuda, collate_mp_brio, AdaptiveWrodRankDataset
 from torch.utils.data import DataLoader
 import torch.distributed as dist
 import torch.multiprocessing as mp
@@ -111,12 +104,12 @@ def evaluation(args):
 
     tok = PegasusTokenizer.from_pretrained(args.model_type)
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
-    # test_set = BrioDataset(f"/work/u5516210/BRIO/cnndm/diverse/test", args.model_type, is_test=True, max_len=1024,
-    test_set = BrioDataset(f"test", args.model_type,dataset=args.config, is_test=True, max_len=512,
+    # test_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm/diverse/test", args.model_type, is_test=True, max_len=1024,
+    test_set = AdaptiveWrodRankDataset(f"test", args.model_type,dataset=args.config, is_test=True, max_len=512,
      is_sorted=False, max_num=args.max_num, is_untok=True, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    # test_set = BrioDataset(f"/work/u5516210/BRIO/xsum/diverse/test", args.model_type, is_test=True, max_len=512,
-    # test_set = BrioDataset(f"/work/u5516210/BRIO/cnndm/diverse/test", args.model_type, is_test=True, max_len=512,
-    # test_set = BrioDataset(f"/work/u5516210/ctrl-sum/datasets/cnndm/test.source",
+    # test_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/xsum/diverse/test", args.model_type, is_test=True, max_len=512,
+    # test_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm/diverse/test", args.model_type, is_test=True, max_len=512,
+    # test_set = AdaptiveWrodRankDataset(f"/work/u5516210/ctrl-sum/datasets/cnndm/test.source",
     #                         "/work/u5516210/ctrl-sum/datasets/cnndm/test.target",
     #                         "facebook/bart-large-cnn", max_len=120, is_test=True,total_len=1024)
     batch_size = 12
@@ -469,14 +462,14 @@ def run(rank, args):
     config = PegasusConfig.from_pretrained(model_path)
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
-    # train_set = BrioDataset(f"/work/u5516210/BRIO/cnndm/diverse/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    # train_set = BrioDataset(f"/work/u5516210/BRIO/cnndm_cased/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    train_set = BrioDataset(f"train", args.model_type,dataset=args.config,
+    # train_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm/diverse/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
+    # train_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm_cased/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
+    train_set = AdaptiveWrodRankDataset(f"train", args.model_type,dataset=args.config,
                             is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    # train_set = BrioDataset(f"/mnt/nas2/m11115088/SimCLS/preprocess_data/{args.dataset}/{args.datatype}/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    val_set = BrioDataset(f"test", args.model_type,dataset=args.config, is_test=True,
+    # train_set = AdaptiveWrodRankDataset(f"/mnt/nas2/m11115088/SimCLS/preprocess_data/{args.dataset}/{args.datatype}/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
+    val_set = AdaptiveWrodRankDataset(f"test", args.model_type,dataset=args.config, is_test=True,
                             is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
-    # val_set = BrioDataset(f"/work/u5516210/BRIO/cnndm_cased/val", args.model_type, is_test=True, max_len=512, is_sorted=False, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
+    # val_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm_cased/val", args.model_type, is_test=True, max_len=512, is_sorted=False, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
 
     dataloader = DataLoader(train_set, batch_size=args.batch_size, shuffle=True, num_workers=8, collate_fn=collate_fn)
         # val_dataloader = DataLoader(val_set, batch_size=1, shuffle=False, num_workers=4, collate_fn=collate_fn_val)
@@ -601,13 +594,6 @@ def run(rank, args):
                     step_cnt = 0
                     epoch_step += 1
                     all_step_cnt += 1
-                    # adjust learning rate
-                    # lr = args.max_lr * min(all_step_cnt ** (-0.5), all_step_cnt * (args.warmup_steps ** (-1.5)))
-                    # for param_group in d_optimizer.param_groups:
-                    #     param_group['lr'] = lr
-                    # scaler.step(d_optimizer)
-                    # scaler.update()
-                    
                     d_optimizer.step()
                     scheduler.step()
                     d_optimizer.zero_grad()
