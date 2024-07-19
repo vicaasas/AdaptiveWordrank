@@ -298,51 +298,7 @@ def test(dataloader, gen_dataloader, model, args, tok, gpuid, do_sample=False):
     else:
         mle_fn = nn.CrossEntropyLoss(ignore_index=tok.pad_token_id)
     
-    # with torch.no_grad():
-    #     # scoring
-    #     for (i, batch) in enumerate(dataloader):
-    #         if args.cuda:
-    #             to_cuda(batch, device)
-    #         samples = batch["data"]
-    #         output = model(batch["src_input_ids"], batch["candidate_ids"], args.normalize, args.score_mode, args.length_penalty, adding=args.adding)
-    #         similarity, gold_similarity = output['score'], output['summary_score']
-    #         similarity = similarity * args.scale
-    #         gold_similarity = gold_similarity * args.scale
-    #         similarity = similarity.cpu().numpy()
-    #         probs = output["probs"]  # [bz, seq_len, word_num]
-    #         probs = output["probs"][:, :-1]  # truncate last token
-    #         gold = batch["candidate_ids"][:, 0, 1:]  # shift right
-    #         mle_loss += mle_fn(probs.transpose(1, 2), gold)
-    #         if i % 1000 == 0:
-    #             print(f"test similarity: {similarity[0]}")
-    #         max_ids = similarity.argmax(1)
-    #         for j in range(similarity.shape[0]):
-    #             cnt += 1
-    #             sample = samples[j]
-    #             sents = sample["candidates"][max_ids[j]][0]
-    #             score = rouge_scorer.score("\n".join(sample["abstract"]), "\n".join(sents))
-    #             rouge1 += score["rouge1"].fmeasure
-    #             rouge2 += score["rouge2"].fmeasure
-    #             rougeLsum += score["rougeLsum"].fmeasure
-            # break
-    # rouge1 = rouge1 / cnt
-    # rouge2 = rouge2 / cnt
-    # rougeLsum = rougeLsum / cnt
-    # mle_loss = mle_loss / cnt
-
-    # if len(args.gpuid) > 1:
-    #     rouge1 = torch.FloatTensor([rouge1]).to(device)
-    #     dist.all_reduce(rouge1, op=dist.reduce_op.SUM)
-    #     rouge1 = rouge1.item() / len(args.gpuid)
-    #     rouge2 = torch.FloatTensor([rouge2]).to(device)
-    #     dist.all_reduce(rouge2, op=dist.reduce_op.SUM)
-    #     rouge2 = rouge2.item() / len(args.gpuid)
-    #     rougeLsum = torch.FloatTensor([rougeLsum]).to(device)
-    #     dist.all_reduce(rougeLsum, op=dist.reduce_op.SUM)
-    #     rougeLsum = rougeLsum.item() / len(args.gpuid)
-    #     dist.all_reduce(mle_loss, op=dist.reduce_op.SUM)
-    #     mle_loss = mle_loss.item() / len(args.gpuid)
-    
+ 
     cnt = 0
     sample_rouge1, sample_rouge2, sample_rougeLsum = 0, 0, 0
     if do_sample:
