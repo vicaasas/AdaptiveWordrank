@@ -18,13 +18,25 @@
 - transformers==4.20.1
 ```
 
-## 3. Dataset and 4. Checkpoint
+## 3. Dataset
 
-Please download each dataset and checkpoint from the provided 
+Please download each dataset from the provided
 
 https://drive.google.com/drive/folders/1AXrsdX7OJTDFrpYleMtIEM2E8O3iJot0?usp=drive_link
 
-Create a folder named 'Dataset' to store the datasets, while the checkpoints can be placed in any desired location.
+and create a folder named 'Dataset' to store them.
+
+
+## 4. Checkpoint
+
+|          | Checkpoints  |
+|----------|---------|
+| CNNDM_GPT    | [vickt/LLM_Teached_BART_CNNDM](https://huggingface.co/vickt/LLM_Teached_BART_CNNDM) <br> [vickt/LLM_Teached_PEGASUS_CNNDM_2](https://huggingface.co/vickt/LLM_Teached_PEGASUS_CNNDM_2)
+| XSUM_GPT    | [GlycerinLOL/LLM_Teached_Bart_100k](https://huggingface.co/GlycerinLOL/LLM_Teached_Bart_100k)<br> [GlycerinLOL/LLM_Teached_Pegasus_100k](https://huggingface.co/GlycerinLOL/LLM_Teached_Pegasus_100k)
+| CNNDM_Human    | [facebook/bart-large-cnn](https://huggingface.co/facebook/bart-large-cnn) <br> [google/pegasus-cnn_dailymail](google/pegasus-cnn_dailymail)
+| XSUM_Human    | [https://huggingface.co/facebook/bart-large-xsum](facebook/bart-large-xsum)<br> [google/pegasus-xsum](https://huggingface.co/google/pegasus-xsum)
+
+
 ## 5. Training
 
 ```bash
