@@ -1027,15 +1027,16 @@ class BartEncoder(BartPretrainedModel):
                 counts = torch.bincount(inverse_indices)
                 sums = torch.zeros_like(unique_x, dtype=torch.float32).scatter_add(0, inverse_indices, filtered_y)
                 average_y = sums / counts.float()
-                m = torch.mean(average_y, dim=-1, keepdim=True)
-                s = torch.std(average_y, dim=-1, keepdim=True)
-                thresholds = m.detach()+0.5*s.detach()
-                # thresholds = m.detach()
-
-                valid_indices = torch.where(average_y > thresholds, True, False)
-                # 決定哪些平均值符合條件
-                # valid_indices = average_y > 6.56
-
+                
+                # inference 時請將記錄的平均長度填上
+                valid_indices = average_y > 6.56
+                
+                # 如果覺得麻煩也可以採用動態方式，兩者結果差距不大
+                # m = torch.mean(average_y, dim=-1, keepdim=True)
+                # s = torch.std(average_y, dim=-1, keepdim=True)
+                # thresholds = m.detach()+0.5*s.detach()
+                # valid_indices = torch.where(average_y > thresholds, True, False)
+                
                 # 收集所有符合條件的索引
                 if valid_indices.any():
                     selected_x = unique_x[valid_indices]
