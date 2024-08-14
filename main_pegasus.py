@@ -460,6 +460,7 @@ def run(rank, args):
 
     tok = PegasusTokenizer.from_pretrained(args.model_type)
     config = PegasusConfig.from_pretrained(model_path)
+    config.auto_calculate_SCAN_threshold = args.auto_calculate_SCAN_threshold
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
     # train_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm/diverse/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)
@@ -669,6 +670,7 @@ if __name__ ==  "__main__":
     parser.add_argument("-p", "--port", type=int, default=12355, help="port")
     parser.add_argument("--model_pt", default="", type=str, help="model path")
     parser.add_argument("--config", default="", type=str, help="config path")
+    parser.add_argument("--auto_calculate_SCAN_threshold", default=False, type=bool, help="auto calculate SCAN threshold")
     parser.add_argument("-is_pegasus", "--is_pegasus", action="store_true", help="use pegasus")
     args = parser.parse_args()
     if args.evaluate:

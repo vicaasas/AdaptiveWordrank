@@ -53,3 +53,9 @@ and create a folder named 'Dataset' to store them.
 ```bash
 >> python main.py --cuda --gpuid [single gpu id] --config [name of the config (cnndm/xsum)] -e --model_pt [model path]  -r 
 ```
+
+### 新功能 update 9/1
+inference 時可以使用 --auto_calculate_SCAN_threshold 參數來自動化計算關鍵字 threshold
+```bash
+>> python main.py --cuda --gpuid [single gpu id] --config [name of the config (cnndm/xsum)] -e --model_pt [model path]  -r --auto_calculate_SCAN_threshold
+```

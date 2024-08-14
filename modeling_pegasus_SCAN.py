@@ -792,6 +792,7 @@ class PegasusEncoder(PegasusPreTrainedModel):
         )
         self.layers = nn.ModuleList([PegasusEncoderLayer(config) for _ in range(config.encoder_layers)])
         self.layer_norm = nn.LayerNorm(config.d_model)
+        self.auto_calculate_SCAN_threshold = config.auto_calculate_SCAN_threshold
         # self.segment_embed = nn.Embedding(1000, embed_dim)
         # self.transition_energy_net = nn.Linear(config.d_model, config.d_model,bias=True)
         # self.keyword_embed = nn.Embedding(config.vocab_size, embed_dim)
@@ -966,15 +967,15 @@ class PegasusEncoder(PegasusPreTrainedModel):
                 counts = torch.bincount(inverse_indices)
                 sums = torch.zeros_like(unique_x, dtype=torch.float32).scatter_add(0, inverse_indices, filtered_y)
                 average_y = sums / counts.float()
+                # 如果覺得麻煩也可以採用動態方式
+                if self.auto_calculate_SCAN_threshold:
+                    m = torch.mean(average_y, dim=-1, keepdim=True)
+                    s = torch.std(average_y, dim=-1, keepdim=True)
+                    thresholds = m.detach()+0.5*s.detach()
+                    valid_indices = torch.where(average_y > thresholds, True, False)
+                else:
                 # inference 時請將記錄的平均長度填上
-                valid_indices = average_y > 6.56
-                
-                # 如果覺得麻煩也可以採用動態方式，兩者結果差距不大
-                # m = torch.mean(average_y, dim=-1, keepdim=True)
-                # s = torch.std(average_y, dim=-1, keepdim=True)
-                # thresholds = m.detach()+0.5*s.detach()
-                # valid_indices = torch.where(average_y > thresholds, True, False)
-
+                    valid_indices = average_y > 6.56
                 # 收集所有符合條件的索引
                 if valid_indices.any():
                     selected_x = unique_x[valid_indices]

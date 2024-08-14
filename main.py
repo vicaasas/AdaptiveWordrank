@@ -67,20 +67,7 @@ def base_setting(args):
     args.adding = getattr(args, "adding", 0) # used for numerical stability
     args.eval_interval = getattr(args, "eval_interval", 1000) # evaluation intervals
     args.num_beams = getattr(args, "num_beams", 4) # number of beams for beam search
-class Extractor(nn.Module):
-    def __init__(self,model=None):
-        super().__init__()
-        self.encoder = model.get_encoder()
 
-    def forward(self, src):
-        input_mask = src["src_input_ids"] != 1
-        output = self.encoder(
-            input_ids=src["src_input_ids"],
-            segment_id=src["segment_id"],
-            attention_mask=input_mask
-        )
-
-        return output
 def evaluation(args):
     # load data
     if args.config == "cnndm":
@@ -448,6 +435,8 @@ def run(rank, args):
         # args.model_type = "/mnt/nas4/m11115088/WordRank/CNN_Model/GPT_final_chpt_bart"
         tok = BartTokenizerFast.from_pretrained(args.model_type)
         config = BartConfig.from_pretrained(model_path)
+        
+    config.auto_calculate_SCAN_threshold = args.auto_calculate_SCAN_threshold
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
     
@@ -627,6 +616,7 @@ if __name__ ==  "__main__":
     parser.add_argument("--model_pt", default="", type=str, help="model path")
     parser.add_argument("--name", default="", type=str, help="project name")
     parser.add_argument("--config", default="", type=str, help="config path")
+    parser.add_argument("--auto_calculate_SCAN_threshold", default=False, type=bool, help="auto calculate SCAN threshold")
     parser.add_argument("-is_pegasus", "--is_pegasus", action="store_true", help="use pegasus")
     args = parser.parse_args()
     # evaluation(args)

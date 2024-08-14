@@ -13,11 +13,11 @@ class AdaptiveWordrank(nn.Module):
     def __init__(self, mname, pad_token_id,config, is_pegasus=False):
         super(AdaptiveWordrank, self).__init__()
         if is_pegasus:
-            self.model = PegasusForConditionalGeneration.from_pretrained(mname, cache_dir="./local_cache")
+            self.model = PegasusForConditionalGeneration.from_pretrained(mname,config, cache_dir="./local_cache")
         else:
             # self.model = BartScorer.from_pretrained(mname, cache_dir="./local_cache")
             # self.model = BartForConditionalGeneration.from_pretrained(mname, cache_dir="./local_cache")
-            self.model = BartForConditionalGeneration.from_pretrained(mname)
+            self.model = BartForConditionalGeneration.from_pretrained(mname,config)
             # self.model = BartForConditionalGeneration(config=config)
         self.pad_token_id = pad_token_id
     def get_encoder(self):
