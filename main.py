@@ -100,9 +100,10 @@ def evaluation(args):
     
     model_path = args.pretrained if args.pretrained is not None else args.model_type
     config = BartConfig.from_pretrained(model_path)
+    config.auto_calculate_SCAN_threshold = args.auto_calculate_SCAN_threshold
+    config.keyword_threshold = args.keyword_threshold
     model = AdaptiveWordrank(model_path, tok.pad_token_id,config, args.is_pegasus)
     model = model.to(device)
-    
     if len(args.model_pt) > 0:
         model.load_state_dict(torch.load(args.model_pt, map_location=f'cuda:{args.gpuid[0]}'),strict=False)
 
@@ -436,7 +437,7 @@ def run(rank, args):
         tok = BartTokenizerFast.from_pretrained(args.model_type)
         config = BartConfig.from_pretrained(model_path)
         
-    config.auto_calculate_SCAN_threshold = args.auto_calculate_SCAN_threshold
+    config.auto_calculate_SCAN_threshold = True
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
     
@@ -617,6 +618,7 @@ if __name__ ==  "__main__":
     parser.add_argument("--name", default="", type=str, help="project name")
     parser.add_argument("--config", default="", type=str, help="config path")
     parser.add_argument("--auto_calculate_SCAN_threshold", default=False, type=bool, help="auto calculate SCAN threshold")
+    parser.add_argument("--keyword_threshold", default=-1, type=int, help="Keyword threshold")
     parser.add_argument("-is_pegasus", "--is_pegasus", action="store_true", help="use pegasus")
     args = parser.parse_args()
     # evaluation(args)

@@ -118,6 +118,8 @@ def evaluation(args):
     
     model_path = args.pretrained if args.pretrained is not None else args.model_type
     config = PegasusConfig.from_pretrained(model_path)
+    config.auto_calculate_SCAN_threshold = args.auto_calculate_SCAN_threshold
+    config.keyword_threshold = args.keyword_threshold
     model = BRIO(model_path, tok.pad_token_id,config, args.is_pegasus)
     device = f'cuda:{args.gpuid[0]}'
     model = model.to(device)
@@ -460,7 +462,8 @@ def run(rank, args):
 
     tok = PegasusTokenizer.from_pretrained(args.model_type)
     config = PegasusConfig.from_pretrained(model_path)
-    config.auto_calculate_SCAN_threshold = args.auto_calculate_SCAN_threshold
+    config.auto_calculate_SCAN_threshold = True
+    config.keyword_threshold = args.keyword_threshold
     collate_fn = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=False)
     collate_fn_val = partial(collate_mp_brio, pad_token_id=tok.pad_token_id, is_test=True)
     # train_set = AdaptiveWrodRankDataset(f"/work/u5516210/BRIO/cnndm/diverse/train", args.model_type,is_sorted=False, max_len=args.max_len, max_num=args.max_num, total_len=args.total_len, is_pegasus=args.is_pegasus)

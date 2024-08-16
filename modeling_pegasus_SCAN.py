@@ -793,6 +793,7 @@ class PegasusEncoder(PegasusPreTrainedModel):
         self.layers = nn.ModuleList([PegasusEncoderLayer(config) for _ in range(config.encoder_layers)])
         self.layer_norm = nn.LayerNorm(config.d_model)
         self.auto_calculate_SCAN_threshold = config.auto_calculate_SCAN_threshold
+        self.keyword_threshold = config.auto_calculate_SCAN_threshold
         # self.segment_embed = nn.Embedding(1000, embed_dim)
         # self.transition_energy_net = nn.Linear(config.d_model, config.d_model,bias=True)
         # self.keyword_embed = nn.Embedding(config.vocab_size, embed_dim)
@@ -975,7 +976,11 @@ class PegasusEncoder(PegasusPreTrainedModel):
                     valid_indices = torch.where(average_y > thresholds, True, False)
                 else:
                 # inference 時請將記錄的平均長度填上
-                    valid_indices = average_y > 6.56
+                    if self.keyword_threshold>=0:
+                        valid_indices = average_y > self.keyword_threshold
+                    else:
+                        raise ValueError('Keyword threshold must >= 0, Keyword threshold' + str(self.keyword_threshold))
+                    
                 # 收集所有符合條件的索引
                 if valid_indices.any():
                     selected_x = unique_x[valid_indices]

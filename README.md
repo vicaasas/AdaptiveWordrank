@@ -51,10 +51,10 @@ and create a folder named 'Dataset' to store them.
 
 ## 7. Evaluate
 ```bash
->> python main.py --cuda --gpuid [single gpu id] --config [name of the config (cnndm/xsum)] -e --model_pt [model path]  -r 
+>> python main.py --cuda --gpuid [single gpu id] --config [name of the config (cnndm/xsum)] -e --model_pt [model path] --keyword_threshold [avg keyword vector length]  -r 
 ```
 
-### New Feature update 9/1
+### New Feature update 8/16
 During inference, you can use the --auto_calculate_SCAN_threshold parameter to automate the calculation of the keyword threshold
 ```bash
 >> python main.py --cuda --gpuid [single gpu id] --config [name of the config (cnndm/xsum)] -e --model_pt [model path]  -r --auto_calculate_SCAN_threshold
