@@ -340,10 +340,7 @@ class PegasusAttention(nn.Module):
                     # y_hard = torch.greater(y, 0.5*1/(idx+1)).type_as(y)
                     # threshold = y.mean(-1) + y.std(-1) 
 
-                    # y_hard = torch.greater(y, 0.3).type_as(y)
-                    y_hard = torch.where(y > thresholds, True, False).type_as(y)
-                    # else:
-                    #     y_hard = torch.greater(y, 0.1).type_as(y)
+                    # .h.greater(y, 0.1).type_as(y)
                     sample = (y_hard - y).detach() + y
                     # sample = sample * self.scale_factor*1/idx + sample.detach() * (1 - self.scale_factor*1/idx)
 
